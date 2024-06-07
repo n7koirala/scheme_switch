@@ -104,4 +104,83 @@ void EvalSchemeSwitch() {
     Ciphertext<DCRTPoly> ciph = cc->Encrypt(kp.publicKey, ptxt);
 
     std::cout << "Encryption successful!" << std::endl;
+
+    /*
+         DCRTPoly ret = aggregationKey*publicKey;
+
+    std::vector<double> x(plaintextParams.GetRingDimension()/2,1);
+    Plaintext ptxt = CKKSContext->MakeCKKSPackedPlaintext(x);
+
+    uint32_t numModuli = CKKSContext->GetElementParams()->GetParams().size();
+    auto elParams = CKKSContext->GetElementParams()->GetParams();
+
+    for (size_t i = 0; i < numModuli; i++) {
+          NativePoly temp(aggregationKey.GetElementAtIndex(0));
+          temp.SwitchModulus(elParams[i]->GetModulus(), elParams[i]->GetRootOfUnity(),0,0);
+          ptxt->GetElement<DCRTPoly>().SetElementAtIndex(i, std::move(temp));
+    }
+
+    Ciphertext<DCRTPoly> aggreg_key_ciph = CKKSContext->Encrypt(kp.publicKey, ptxt);
+
+     Plaintext pt1;
+     CKKSContext->Decrypt(kp.secretKey, aggreg_key_ciph, &pt1);
+
+
+    // converting public key to plaintext
+    std::vector<double> x1(plaintextParams.GetRingDimension()/2,1);
+    Plaintext ptxt_public_key = CKKSContext->MakeCKKSPackedPlaintext(x1);
+
+    for (size_t i = 0; i < numModuli; i++) {
+          NativePoly temp(publicKey.GetElementAtIndex(0));
+          temp.SwitchModulus(elParams[i]->GetModulus(), elParams[i]->GetRootOfUnity(),0,0);
+          ptxt_public_key->GetElement<DCRTPoly>().SetElementAtIndex(i, std::move(temp));
+    }
+
+    Ciphertext<DCRTPoly> ret_ciph = CKKSContext->EvalMult(aggreg_key_ciph, ptxt_public_key);
+
+
+    DCRTPoly temp_sum;
+    temp_sum = DCRTPoly(ciphertextParams.GetParams(),EVALUATION);
+    temp_sum.SetValuesToZero();
+
+    //Add all the ciphertexts (mod q)
+    if(!num_additions){
+        num_additions = ciphertexts.size();
+    }
+
+    for(unsigned int i = 0; i < num_additions; i++){
+        temp_sum += ciphertexts.at(i % ciphertexts.size());
+    }
+
+    std::vector<double> x2(plaintextParams.GetRingDimension()/2,0);
+    Plaintext ptxt_temp_sum = CKKSContext->MakeCKKSPackedPlaintext(x2);
+
+    for (size_t i = 0; i < numModuli; i++) {
+          NativePoly temp(publicKey.GetElementAtIndex(0));
+          temp.SwitchModulus(elParams[i]->GetModulus(), elParams[i]->GetRootOfUnity(),0,0);
+          ptxt_temp_sum->GetElement<DCRTPoly>().SetElementAtIndex(i, std::move(temp));
+    }
+
+    Ciphertext<DCRTPoly> final_sum = CKKSContext->EvalAdd(ret_ciph, ptxt_temp_sum);
+
+    // std::cout << "precision bits after decryption: " << pt1->GetLogPrecision() << std::endl;
+
+    // std::vector<double> vec_result = pt1->GetRealPackedValue();
+
+    // std::cout << "contents of the final_sum ciphertext: " << std::endl;
+    // for (auto i: vec_result){
+    //     std::cout << i << ' ';
+    // }
+
+    auto end = std::chrono::steady_clock::now();
+    //Now scale and reduce
+    //return ret.scale_down(plain_parms, *q_to_t);
+    SwitchBasis(ret, plaintextParams);
+
+    std::cout << "ret contents" << ret << std::endl;
+    
+    return ret;
+    */
+
+    
 }
