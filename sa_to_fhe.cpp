@@ -1,5 +1,8 @@
 
 #include "openfhe.h"
+ #include "dgsampler.h"
+ #include "constants.h"
+
 
 using namespace lbcrypto;
 
@@ -62,17 +65,31 @@ void EvalSchemeSwitch() {
               << std::endl;
 
     DCRTPoly aggregationKey;
-    std::shared_ptr<ILDCRTParams<BigInteger>> parms = GenerateDCRTParams<BigInteger>(1024,1,19);
+    std::shared_ptr<ILDCRTParams<BigInteger>> parms = GenerateDCRTParams<BigInteger>(2048,1,53);
 
-    aggregationKey = DCRTPoly(parms,EVALUATION);
+    aggregationKey = DCRTPoly(parms,COEFFICIENT);
     aggregationKey.SetValuesToZero();
 
+    // DiscreteLaplacianGenerator dl;
 
-    const unsigned int ringDim = 1 << 9;
+    // dl.addRandomNoise(aggregationKey,10,UNIFORM);
+
+    //Populate integer values into DCRTPoly
+    for (size_t i = 0; i < aggregationKey.GetAllElements().size(); ++i) {
+        NativePoly element = aggregationKey.GetElementAtIndex(i);
+        for (size_t j = 0; j < element.GetLength(); ++j) {
+            element[j] = NativeInteger(4); // Example: setting values to 1, 2, 3, ...
+        }
+        aggregationKey.SetElementAtIndex(i, std::move(element));
+    }
+
+     std::cout << aggregationKey << std::endl;
+
+    const unsigned int ringDim = 1 << 10;
     CCParams<CryptoContextCKKSRNS> CKKSparameters;
 
-    CKKSparameters.SetMultiplicativeDepth(1);
-   CKKSparameters.SetScalingModSize(50);
+CKKSparameters.SetMultiplicativeDepth(2);
+   CKKSparameters.SetScalingModSize(30);
    CKKSparameters.SetRingDim(ringDim);
    CKKSparameters.SetSecurityLevel(HEStd_NotSet);
 
@@ -91,6 +108,7 @@ void EvalSchemeSwitch() {
 
     std::vector<double> x(ringDim/2,1);
     Plaintext ptxt = cc->MakeCKKSPackedPlaintext(x);
+    ptxt->SetFormat(Format::COEFFICIENT);
 
     uint32_t numModuli = cc->GetElementParams()->GetParams().size();
     auto elParams = cc->GetElementParams()->GetParams();
@@ -103,7 +121,23 @@ void EvalSchemeSwitch() {
 
     Ciphertext<DCRTPoly> ciph = cc->Encrypt(kp.publicKey, ptxt);
 
+//    std::cout <<"getelement: " <<ciph.GetAllElements() << std::endl;
+
     std::cout << "Encryption successful!" << std::endl;
+
+
+    Plaintext pt1;
+    cc->Decrypt(kp.secretKey, ciph, &pt1);
+        pt1->SetFormat(Format::COEFFICIENT);
+
+
+    std::vector<double> vec_result = pt1->GetRealPackedValue();
+
+    std::cout << "contents of the final_sum ciphertext: " << std::endl;
+    for (auto i: vec_result){
+        std::cout << i << ' ';
+    }
+
 
     /*
          DCRTPoly ret = aggregationKey*publicKey;
