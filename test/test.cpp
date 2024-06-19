@@ -13,9 +13,9 @@ void PopulateAndEncryptDCRTPoly() {
     std::cout << "--------------------------------- Populate and Encrypt DCRTPoly ---------------------------------" << std::endl;
 
     // Set CKKS parameters
-    uint32_t batchSize = 8;
+    uint32_t batchSize = 16;
     uint32_t depth = 1;
-    uint32_t scaleModSize = 48;
+    uint32_t scaleModSize = 25;
 
     CCParams<CryptoContextCKKSRNS> parameters;
     parameters.SetMultiplicativeDepth(depth);
@@ -47,21 +47,48 @@ void PopulateAndEncryptDCRTPoly() {
     auto params = cc->GetCryptoParameters()->GetElementParams();
     DCRTPoly poly(params, Format::EVALUATION, true);
     poly.SetValuesToZero();
+    int aggVal = 125;
 
-    // for (size_t i = 0; i < poly.GetAllElements().size(); ++i) {
-    //     NativePoly element = poly.GetElementAtIndex(i);
-    //     for (size_t j = 0; j < element.GetLength(); ++j) {
-    //         element[j] = NativeInteger(4); // Example: setting values to 1, 2, 3, ...
-    //     }
-    //     poly.SetElementAtIndex(i, std::move(element));
-    // }
+    for (size_t i = 0; i < poly.GetAllElements().size(); ++i) {
+        NativePoly element = poly.GetElementAtIndex(i);
+        for (size_t j = 0; j < element.GetLength(); ++j) {
+            element[j] = NativeInteger(aggVal); 
+        }
+        poly.SetElementAtIndex(i, std::move(element));
+    }
 
-    // std::cout << "DCRTPoly before populating :" << std::endl;
-    // std::cout << poly << std::endl;
+    // Convert DCRTPoly to Plaintext
+    poly.SetFormat(Format::COEFFICIENT);
+    std::vector<std::complex<double>> complexValues;
+    for (size_t i = 0; i < poly.GetLength(); ++i) {
+       complexValues.emplace_back(static_cast<double>(poly.GetElementAtIndex(0)[i].ConvertToDouble()), 0.0);
+    }
+    complexValues.resize(batchSize);
 
-    std::vector<double> input{ 40000 };
-    Plaintext ptxt = cc->MakeCKKSPackedPlaintext(input);
-    poly = ptxt->GetElement<DCRTPoly>();
+    Plaintext ptxt = cc->MakeCKKSPackedPlaintext(complexValues);
+
+    // Encrypt the Plaintext object
+    start = std::chrono::high_resolution_clock::now();
+    auto ciphertext = cc->Encrypt(keys.publicKey, ptxt);
+    end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> encryptionTime = end - start;
+    std::cout << "Encryption time: " << encryptionTime.count() << " seconds" << std::endl;
+
+    // Decrypt and display the result
+    Plaintext result;
+    start = std::chrono::high_resolution_clock::now();
+    cc->Decrypt(ciphertext, keys.secretKey, &result);
+    end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> decryptionTime = end - start;
+    std::cout << "Decryption time: " << decryptionTime.count() << " seconds" << std::endl;
+
+    result->SetLength(50);
+    std::cout << "Decrypted result: " << result << std::endl;
+
+}
+
+/*
+// Utility code (might be helpful in future):
 
     // uint32_t numModuli = cc->GetElementParams()->GetParams().size();
     // auto elParams = cc->GetElementParams()->GetParams();
@@ -75,25 +102,46 @@ void PopulateAndEncryptDCRTPoly() {
     // std::cout << "DCRTPoly after populating :" << std::endl;
     // std::cout << poly << std::endl;
 
-    std::cout << "Input vector: " << ptxt << std::endl;
 
-    // Encrypt the DCRTPoly object
-    start = std::chrono::high_resolution_clock::now();
-    auto ciphertext = cc->Encrypt(keys.publicKey, ptxt);
-    end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> encryptionTime = end - start;
-    std::cout << "Encryption time: " << encryptionTime.count() << " seconds" << std::endl;
+// poly -> plaintext -> ciphertext
+
+    //ptxt->GetElement<DCRTPoly>() = poly;
+
+    // std::cout << "Input vector: " << ptxt << std::endl;
+
+    // Set the format to COEFFICIENT
+    poly.SetFormat(Format::COEFFICIENT);
+
+    // Convert DCRTPoly to a single polynomial
+    Poly interpolatedPoly = poly.CRTInterpolate();
+
+    // Manually convert the values to a vector of complex numbers
+    std::vector<std::complex<double>> complexValues;
+    for (size_t i = 0; i < interpolatedPoly.GetLength(); ++i) {
+        complexValues.emplace_back(static_cast<double>(interpolatedPoly[i].ConvertToDouble()), 0.0);
+    }
+
+    //size_t slots = std::max(batchSize, static_cast<uint32_t>(complexValues.size()));
+    complexValues.resize(batchSize);  // Truncate or pad with zeros if necessary
 
 
-    // Decrypt and display the result
-    Plaintext result;
+    Plaintext result = (std::make_shared<CKKSPackedEncoding>(params, cc->GetEncodingParams(), complexValues, 1, 0, 1.0, batchSize));
 
-    start = std::chrono::high_resolution_clock::now();
-    cc->Decrypt(ciphertext, keys.secretKey, &result);
-    end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> decryptionTime = end - start;
-    std::cout << "Decryption time: " << decryptionTime.count() << " seconds" << std::endl;
+    //std::cout << "Converted Plaintext: " << result << std::endl;
 
-    result->SetLength(batchSize);
-    std::cout << "Decrypted result: " << result << std::endl;
-}
+    std::vector<double> vec_result = result->GetRealPackedValue();
+
+    std::cout << "contents of the Converted Plaintext: " << std::endl;
+    int j = 0;
+    for (auto i: vec_result){
+        std::cout << i << ' ';
+        j++;
+        if(j>10){
+            break;
+        }
+    }
+    std::cout << "\n" << std::endl;
+*/
+    
+
+   
