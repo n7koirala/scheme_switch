@@ -78,12 +78,27 @@ void PopulateAndEncryptDCRTPoly() {
     // Create and populate the DCRTPoly object
     auto params = cc->GetCryptoParameters()->GetElementParams();
     DCRTPoly poly(params, Format::EVALUATION, true);
+    poly.SetValuesToZero();
+    int aggVal = 125;
+    std::cout << "Aggregation value: " << aggVal << std::endl;
 
-    std::vector<double> input{ 4000 };
-    Plaintext ptxt = cc->MakeCKKSPackedPlaintext(input);
-    poly = ptxt->GetElement<DCRTPoly>();
+    for (size_t i = 0; i < poly.GetAllElements().size(); ++i) {
+        NativePoly element = poly.GetElementAtIndex(i);
+        for (size_t j = 0; j < element.GetLength(); ++j) {
+            element[j] = NativeInteger(aggVal); 
+        }
+        poly.SetElementAtIndex(i, std::move(element));
+    }
 
-    std::cout << "Input vector: " << ptxt << std::endl;
+    // Convert DCRTPoly to Plaintext
+    poly.SetFormat(Format::COEFFICIENT);
+    std::vector<std::complex<double>> complexValues;
+    for (size_t i = 0; i < poly.GetLength(); ++i) {
+       complexValues.emplace_back(static_cast<double>(poly.GetElementAtIndex(0)[i].ConvertToDouble()), 0.0);
+    }
+    complexValues.resize(batchSize);
+
+    Plaintext ptxt = cc->MakeCKKSPackedPlaintext(complexValues);
 
     // Timing encryption
     start = std::chrono::high_resolution_clock::now();
