@@ -2,9 +2,6 @@
 
 ## Introduction
 
-Welcome to the **Scheme Switching** project! This repository contains a comprehensive implementation of fingerprint matching algorithms. The primary goal of this project is to provide a robust framework for the comparison and matching of fingerprint data using advanced cryptographic techniques, specifically homomorphic encryption.
-
-
 This repo contains the implementation of a scheme-switching idea where a Secure Aggregation's (SA) aggregator key is converted to a fully homomorphic encryption (FHE) ciphertext in OpenFHE. The primary goal of this project is to allow scheme switching of SA ciphertexts to FHE to allow for homomorphic evaluations on SA ciphertexts.
 
 
