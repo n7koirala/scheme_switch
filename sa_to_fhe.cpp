@@ -1,6 +1,15 @@
 #include "openfhe.h"
 
+// header files needed for serialization
+#include "ciphertext-ser.h"
+#include "cryptocontext-ser.h"
+#include "key/key-ser.h"
+#include "scheme/ckksrns/ckksrns-ser.h"
+
+
 using namespace lbcrypto;
+
+const std::string DATAFOLDER = "/home/nkoirala/scheme_switch/build/ciphertexts";
 
 void RunCKKSWoFault();
 
@@ -325,17 +334,33 @@ void RunCKKSWoFault() {
     Ciphertext<DCRTPoly> ciphertext;
     ciphertext = cc->Encrypt(kp5.publicKey, plaintext);
 
+    if (!Serial::SerializeToFile(DATAFOLDER + "/ciphertext.txt", ciphertext, SerType::BINARY)) {
+        std::cerr << " Error writing ciphertext 0" << std::endl;
+    }
+
     Ciphertext<DCRTPoly> ciphertext1;
     ciphertext1 = cc->Encrypt(kp5.publicKey, plaintext1);
+    if (!Serial::SerializeToFile(DATAFOLDER + "/ciphertext1.txt", ciphertext1, SerType::BINARY)) {
+        std::cerr << " Error writing ciphertext 1" << std::endl;
+    }
 
     Ciphertext<DCRTPoly> ciphertext2;
     ciphertext2 = cc->Encrypt(kp5.publicKey, plaintext2);
+    if (!Serial::SerializeToFile(DATAFOLDER + "/ciphertext2.txt", ciphertext2, SerType::BINARY)) {
+        std::cerr << " Error writing ciphertext 2" << std::endl;
+    }
 
     Ciphertext<DCRTPoly> ciphertext3;
     ciphertext3 = cc->Encrypt(kp5.publicKey, plaintext3);
+    if (!Serial::SerializeToFile(DATAFOLDER + "/ciphertext3.txt", ciphertext3, SerType::BINARY)) {
+        std::cerr << " Error writing ciphertext 3" << std::endl;
+    }
 
     Ciphertext<DCRTPoly> ciphertext4;
     ciphertext4 = cc->Encrypt(kp5.publicKey, plaintext4);
+    if (!Serial::SerializeToFile(DATAFOLDER + "/ciphertext4.txt", ciphertext4, SerType::BINARY)) {
+        std::cerr << " Error writing ciphertext 4" << std::endl;
+    }
 
     std::cout << "SA to FHE conversion completed." << std::endl;
     std::cout << "\n";
@@ -759,20 +784,37 @@ void RunCKKSWithFault() {
     std::cout << "Performing SA to FHE conversion.." << std::endl;
     std::cout << "\tSA ciphertexts are being converted to FHE ciphertexts." << std::endl;
 
+    
     Ciphertext<DCRTPoly> ciphertext;
     ciphertext = cc->Encrypt(kp5.publicKey, plaintext);
 
+    if (!Serial::SerializeToFile(DATAFOLDER + "/ciphertext.txt", ciphertext, SerType::BINARY)) {
+        std::cerr << " Error writing ciphertext 0" << std::endl;
+    }
+
     Ciphertext<DCRTPoly> ciphertext1;
     ciphertext1 = cc->Encrypt(kp5.publicKey, plaintext1);
+    if (!Serial::SerializeToFile(DATAFOLDER + "/ciphertext1.txt", ciphertext1, SerType::BINARY)) {
+        std::cerr << " Error writing ciphertext 1" << std::endl;
+    }
 
     Ciphertext<DCRTPoly> ciphertext2;
     ciphertext2 = cc->Encrypt(kp5.publicKey, plaintext2);
+    if (!Serial::SerializeToFile(DATAFOLDER + "/ciphertext2.txt", ciphertext2, SerType::BINARY)) {
+        std::cerr << " Error writing ciphertext 2" << std::endl;
+    }
 
     Ciphertext<DCRTPoly> ciphertext3;
     ciphertext3 = cc->Encrypt(kp5.publicKey, plaintext3);
+    if (!Serial::SerializeToFile(DATAFOLDER + "/ciphertext3.txt", ciphertext3, SerType::BINARY)) {
+        std::cerr << " Error writing ciphertext 3" << std::endl;
+    }
 
     Ciphertext<DCRTPoly> ciphertext4;
     ciphertext4 = cc->Encrypt(kp5.publicKey, plaintext4);
+    if (!Serial::SerializeToFile(DATAFOLDER + "/ciphertext4.txt", ciphertext4, SerType::BINARY)) {
+        std::cerr << " Error writing ciphertext 4" << std::endl;
+    }
 
     std::cout << "SA to FHE conversion completed." << std::endl;
     std::cout << "\n";
