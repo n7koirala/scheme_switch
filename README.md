@@ -42,7 +42,7 @@ To run the application, run the executable under the build folder:
 ```bash
 ./build/sa_to_fhe
 ```
-The user will be prompted with an option to run the simulation with one of the parties faulting or without. If the user chooses the fault option, the fault will be automatically handled, and secret shares of the faulting party will be generated using the secret shares of the remaining parties to complete the decryption process.
+The user will be prompted with an option to run the simulation with one of the parties faulting or without. If the user chooses the fault option, the fault will be automatically handled, and missing secret share of the faulting party will be generated using the secret shares of the remaining parties to complete the decryption process.
 
 ### Parameters
 
