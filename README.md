@@ -4,7 +4,7 @@
 
 This repo contains the implementation of a scheme-switching idea where a Secure Aggregation's (SA) aggregator key is converted to a fully homomorphic encryption (FHE) ciphertext in OpenFHE. The primary goal of this project is to allow scheme switching of SA ciphertexts to FHE to allow for homomorphic evaluations on SA ciphertexts. After the homomorphic evaluations, decryption is completed using multi-party threshold FHE, where we tolerate faults (i.e., one of the parties dropping out) occurring during the protocol. 
 
-For the theoretical details, refer to the document: [Scheme-Switching Documentation](https://www.overleaf.com/read/tkxbxcgypkqj#ca3573).
+For the theoretical details of this implementation, refer to this document: [Scheme-Switching Documentation](https://www.overleaf.com/read/tkxbxcgypkqj#ca3573).
 
 ## Requirements
 
