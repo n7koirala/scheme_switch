@@ -11,7 +11,7 @@ For the theoretical details of this implementation, refer to this document: [Sch
 - **C++ Compiler**: Ensure you have a modern C++ compiler that supports C++17 or later.
 - **CMake**: Build system generator (version 3.10 or later).
 - **OpenFHE Library**: For homomorphic encryption operations.
-- **Standard Libraries**: Standard libraries for image processing and mathematical computations.
+- **Standard Libraries**: Standard libraries for mathematical computations.
 
 ## Installation
 
